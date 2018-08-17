@@ -1,0 +1,56 @@
+﻿Project of Model Predictive Control (MPC)
+
+
+Implementation of MPC
+
+This project involves C++ program which simulate car drives around a virtual track using Model Predictive Control (MPC). Based on the draft and online course, I filled in and follow steps to complete this project. Although my result still has some issue, such as car drives on side line when sharply turn, this car can eventually drive by itself a lap without any accident. 
+
+The following steps are basic workflow in this project:
+
+	1.	Fitting a polynomial to the waypoints by using “polyfit”;
+	2.	Implementing MPC to set up parameters and constrains;
+	2.	Calculate tracking error by using “polyeval”;
+	3.	Estimate running steer angle and throttle value;
+	4.	Display the MPC predicted trajectory by separating “vars” values; 
+	5.	Testing whole setup to record a video.
+
+
+The model:
+
+My model is composed of four component, they are position [x,y], heading angle(θ) and velocity (v). Two actuators are steering angle Φ, which is set [-30, 30], and throttle value, in which minus number [-1,0] stands for brake and positive number [0,1] stands for accelerating. 
+
+The functions I used to update vehicle’s status at each step are listed below:
+
+
+
+
+
+
+
+
+
+
+
+The error cross tracking functions are used to build the cost function of MPC, they are also updated at each time step:
+
+
+
+
+
+
+Timestep Length and Elapsed Duration (N & dt)
+I tested several combinations of N and dt but did not get successful result. I tried N=25 and dt = 0.15, but vehicle swings and at last drove out of lane.  I also tried N=5 and dt =0.15, but vehicle refused to turn back to correct track but just directly drive to off the road. Then I tried N=15 and dt =0.15 (2.25s). This time vehicle performs well and drive a lap without running to outside of lane. 
+
+Since N determines the number of variables optimized at MPC, with fixed time sample dt, large N makes prediction of future more ambiguity. Small N won’t give valid prediction for future route.
+
+Polynomial Fitting and MPC Preprocessing
+I applied three order polynomial to fit the data. Cross track error was calculated and passed to MPC routine.
+Model Predictive Control with Latency
+A contributing factor to latency is actuator dynamics. As course noted, one approach would be running a simulation using the vehicle model starting from the current state for the duration of the latency. Therefore actual state of the vehicle was shifted to the future with 100 ms latency. 
+ 
+
+
+
+
+
+
